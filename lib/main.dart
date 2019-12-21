@@ -48,7 +48,7 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  void _clearCounter(){
+  void _clearCounter() {
     setState(() {
       _counter = 0;
     });
@@ -96,7 +96,10 @@ class _MyHomePageState extends State<MyHomePage> {
               style: Theme.of(context).textTheme.display1,
             ),
             RaisedButton(
-              child: Text("Clear", style: TextStyle(color: Colors.white),),
+              child: Text(
+                "Clear",
+                style: TextStyle(color: Colors.white),
+              ),
               color: Colors.red,
               onPressed: _clearCounter,
             )
