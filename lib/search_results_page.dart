@@ -1,20 +1,50 @@
 import 'package:flutter/material.dart';
+import 'package:red_tailed_hawk/models/trip_model.dart';
+import 'package:red_tailed_hawk/models/user_model.dart';
 
 class SearchResultsPage extends StatefulWidget {
   @override
   _SearchResultsPageState createState() => _SearchResultsPageState();
+
+  SearchResultsPage(this.searchTerm);
+
+  final String searchTerm;
 }
 
 class _SearchResultsPageState extends State<SearchResultsPage> {
-  Future<List> _calculation = Future<List>.delayed(
-    Duration(seconds: 2),
-    () => List.generate(7, (int index) {
-      return {
-        'name': 'Person $index',
-        'rating': index % 5,
-      };
-    }),
-  );
+  Future<List> _calculation;
+
+  @override
+  void initState() {
+    super.initState();
+    _calculation = filterTrips();
+  }
+
+  Future<List> filterTrips() async {
+    List<Trip> trips = await Trip.fetchTrips();
+    print('print all trips');
+    print(trips);
+    List<Trip> searchedTrips = trips.where(
+      (Trip trip) {
+        print(trip.destination);
+        return trip.destination.contains(widget.searchTerm);
+      },
+    ).toList();
+
+    List withTraveller = [];
+    searchedTrips.forEach((Trip trip) async {
+      Traveller traveller = await Traveller.fetchTraveller(trip.travellerId);
+      withTraveller.add({
+        'trip': trip,
+        'traveller': traveller,
+      });
+    });
+
+    // Traveller.fetchTraveller(id)
+    print('print searched');
+    print(withTraveller);
+    return withTraveller;
+  }
 
   @override
   Widget build(BuildContext context) {

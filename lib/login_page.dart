@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:red_tailed_hawk/home_page.dart';
 import 'package:red_tailed_hawk/sign_up_page.dart';
@@ -12,7 +13,7 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  bool isSwitched = true;
+  bool _isDriver = true;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -110,8 +111,15 @@ class _LoginPageState extends State<LoginPage> {
                 _textInput(Icons.lock, "Password", true),
               ],
             ),
-            MyAccountSwitchButton(),
-            _loginButton(context),
+            MyAccountSwitchButton(
+              isDriver: _isDriver,
+              onSwitch: (bool value) {
+                setState(() {
+                  _isDriver = value;
+                });
+              },
+            ),
+            _loginButton(context, _isDriver),
             FlatButton(
               onPressed: () {},
               child: Text(
@@ -126,11 +134,14 @@ class _LoginPageState extends State<LoginPage> {
   }
 }
 
-Widget _loginButton(BuildContext context) {
-
+Widget _loginButton(BuildContext context, bool forDriver) {
   loginUser() {
     Navigator.push(
-        context, MaterialPageRoute(builder: (context) => HomePage()));
+      context,
+      CupertinoPageRoute(
+        builder: (context) => HomePage(forDriver),
+      ),
+    );
   }
 
   return Padding(
@@ -162,53 +173,54 @@ Widget _loginButton(BuildContext context) {
   );
 }
 
-Widget _signUpButton(bool forTraveller, String buttonText, IconData icon, BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: 5.0),
-      child: InkWell(
-        onTap: () {
-          print("Sign In Pressed");
-        },
-        child: Container(
-          height: 50,
-          width: 268,
-          decoration: BoxDecoration(
-            color: Color(0xFFFFA000),
-            borderRadius: BorderRadius.circular(15),
-          ),
-          child: Stack(
-            children: <Widget>[
-              Positioned(
-                child: Container(
-                    height: 50,
-                    width: 50,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(15),
-                      color: Color(0xFFC67100),
-                    ),
-                    child: Icon(
-                      icon,
-                      color: Colors.white,
-                    )),
-              ),
-              Positioned.fill(
-                left: 40,
-                child: Align(
-                  alignment: Alignment.center,
-                  child: Text(
-                    buttonText,
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold),
+Widget _signUpButton(
+    bool forTraveller, String buttonText, IconData icon, BuildContext context) {
+  return Padding(
+    padding: EdgeInsets.symmetric(vertical: 5.0),
+    child: InkWell(
+      onTap: () {
+        print("Sign In Pressed");
+      },
+      child: Container(
+        height: 50,
+        width: 268,
+        decoration: BoxDecoration(
+          color: Color(0xFFFFA000),
+          borderRadius: BorderRadius.circular(15),
+        ),
+        child: Stack(
+          children: <Widget>[
+            Positioned(
+              child: Container(
+                  height: 50,
+                  width: 50,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(15),
+                    color: Color(0xFFC67100),
                   ),
+                  child: Icon(
+                    icon,
+                    color: Colors.white,
+                  )),
+            ),
+            Positioned.fill(
+              left: 40,
+              child: Align(
+                alignment: Alignment.center,
+                child: Text(
+                  buttonText,
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold),
                 ),
-              )
-            ],
-          ),
+              ),
+            )
+          ],
         ),
       ),
-    );
+    ),
+  );
 }
 
 Widget _loginSignUpDivider() {
@@ -274,13 +286,16 @@ Widget _textInput(IconData icon, String placeholder, bool isPassword) {
   );
 }
 
-class MyAccountSwitchButton extends StatefulWidget {
-  @override
-  _MyAccountSwitchButtonState createState() => _MyAccountSwitchButtonState();
-}
+class MyAccountSwitchButton extends StatelessWidget {
+//   @override
+//   _MyAccountSwitchButtonState createState() => _MyAccountSwitchButtonState();
+// }
 
-class _MyAccountSwitchButtonState extends State<MyAccountSwitchButton> {
-  bool isSwitched = true;
+// class _MyAccountSwitchButtonState extends State<MyAccountSwitchButton> {
+  MyAccountSwitchButton({this.isDriver, this.onSwitch});
+
+  final bool isDriver;
+  final void Function(bool) onSwitch;
 
   @override
   Widget build(BuildContext context) {
@@ -289,12 +304,8 @@ class _MyAccountSwitchButtonState extends State<MyAccountSwitchButton> {
       children: <Widget>[
         Text("Traveller"),
         Switch(
-          onChanged: (value) {
-            setState(() {
-              isSwitched = value;
-            });
-          },
-          value: isSwitched,
+          onChanged: onSwitch,
+          value: isDriver,
           activeTrackColor: Color(0xffFFD299),
           activeColor: Colors.orange,
         ),

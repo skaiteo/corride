@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:red_tailed_hawk/components/home_search_card.dart';
 
 class HomePage extends StatelessWidget {
+  HomePage(this.isDriver);
+
+  final bool isDriver;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
