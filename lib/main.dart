@@ -1,8 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:red_tailed_hawk/login_page.dart';
-import 'package:red_tailed_hawk/view_driver_details.dart';
-import 'package:red_tailed_hawk/view_trip_details.dart';
 
 void main() => runApp(MyApp());
 

@@ -31,7 +31,7 @@ class Trip {
 
   static Future<List<Trip>> fetchTrips({int userId}) async {
     final response = await http.get(
-      'https://corride.000webhostapp.com/corride/trip/getTrip.php${(userId != null) ? '?id=$userId' : ''}',
+      'https://corride.000webhostapp.com/corride/trip/getTrip.php${(userId == null) ? '' : '?id=$userId'}',
     );
 
     if (response.statusCode == 200) {
@@ -44,7 +44,7 @@ class Trip {
         trips.add(Trip.fromJson(tripMap));
       });
 
-      return trips;
+      return trips.reversed.toList();
     } else {
       // If that call was not successful, throw an error.
       throw Exception('Failed to load trips');

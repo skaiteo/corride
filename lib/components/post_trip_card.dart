@@ -2,16 +2,15 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:date_range_picker/date_range_picker.dart' as DateRagePicker;
 import 'package:numberpicker/numberpicker.dart';
-import 'package:red_tailed_hawk/search_results_page.dart';
 
 enum SearchType { destination, date, pax }
 
-class SearchCard extends StatefulWidget {
+class PostTripCard extends StatefulWidget {
   @override
-  _SearchCardState createState() => _SearchCardState();
+  _PostTripCardState createState() => _PostTripCardState();
 }
 
-class _SearchCardState extends State<SearchCard> {
+class _PostTripCardState extends State<PostTripCard> {
   // TextEditingController _destCtrlr = TextEditingController();
   // TextEditingController _dateCtrlr = TextEditingController();
   // TextEditingController _paxCtrlr = TextEditingController();
@@ -46,7 +45,7 @@ class _SearchCardState extends State<SearchCard> {
             Padding(
               padding: EdgeInsets.symmetric(vertical: 7.0),
               child: Text(
-                'Search for a Ride',
+                'Post a Trip',
                 style: Theme.of(context).textTheme.title,
               ),
             ),
@@ -101,23 +100,25 @@ class _SearchCardState extends State<SearchCard> {
                   ),
                   color: Colors.orange,
                   child: Text(
-                    'Search Drivers',
+                    'Post Trip',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 17.0,
                     ),
                   ),
                   onPressed: () {
+                    print('Button press by traveller to post a new trip');
                     print(_pickedDest);
                     print(_pickedDates);
                     print(_pickedPax);
-                    Navigator.of(context).push(
-                      CupertinoPageRoute(
-                        builder: (BuildContext context) => SearchResultsPage(
-                          'random-search',
-                        ),
-                      ),
-                    );
+                    // Navigator.of(context).push(
+                    //   CupertinoPageRoute(
+                    //     builder: (BuildContext context) => SearchResultsPage(
+                    //       'random-search',
+
+                    //     ),
+                    //   ),
+                    // );
                   },
                 ),
               ),
@@ -136,8 +137,6 @@ class SearchField extends StatefulWidget {
     // @required this.searchHintText,
     // @required this.controller,
     this.onComplete,
-    // this.readOnly: true,
-    // TODO: Remove this later if destination field is not to be typed manually
   });
 
   final SearchType searchType;

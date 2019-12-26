@@ -1,12 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:red_tailed_hawk/home_page.dart';
 
-class ViewDriverDetails extends StatefulWidget {
-  @override
-  _ViewDriverDetailsState createState() => _ViewDriverDetailsState();
-}
-
-class _ViewDriverDetailsState extends State<ViewDriverDetails> {
+class ViewDriverDetails extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(

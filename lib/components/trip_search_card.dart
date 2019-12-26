@@ -1,17 +1,16 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:date_range_picker/date_range_picker.dart' as DateRagePicker;
-import 'package:numberpicker/numberpicker.dart';
 import 'package:red_tailed_hawk/search_results_page.dart';
 
 enum SearchType { destination, date, pax }
 
-class SearchCard extends StatefulWidget {
+class TripSearchCard extends StatefulWidget {
   @override
-  _SearchCardState createState() => _SearchCardState();
+  _TripSearchCardState createState() => _TripSearchCardState();
 }
 
-class _SearchCardState extends State<SearchCard> {
+class _TripSearchCardState extends State<TripSearchCard> {
   // TextEditingController _destCtrlr = TextEditingController();
   // TextEditingController _dateCtrlr = TextEditingController();
   // TextEditingController _paxCtrlr = TextEditingController();
@@ -24,7 +23,7 @@ class _SearchCardState extends State<SearchCard> {
   // }
   List<DateTime> _pickedDates = [];
   // int _pickedPax;
-  String _pickedDest;
+  String _pickedDest = '';
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +45,7 @@ class _SearchCardState extends State<SearchCard> {
             Padding(
               padding: EdgeInsets.symmetric(vertical: 7.0),
               child: Text(
-                'Search for a Ride',
+                'Search for a Trip',
                 style: Theme.of(context).textTheme.title,
               ),
             ),
@@ -57,6 +56,11 @@ class _SearchCardState extends State<SearchCard> {
               // controller: _destCtrlr,
               // onTapCallback: () {},
               searchType: SearchType.destination,
+              onComplete: (String dest) {
+                setState(() {
+                  _pickedDest = dest;
+                });
+              },
               // readOnly: false,
             ),
             SearchField(
@@ -100,25 +104,34 @@ class _SearchCardState extends State<SearchCard> {
                     borderRadius: BorderRadius.circular(15.0),
                   ),
                   color: Colors.orange,
+                  disabledColor: Colors.grey,
                   child: Text(
-                    'Search Drivers',
+                    'Search Trips',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 17.0,
                     ),
                   ),
-                  onPressed: () {
-                    print(_pickedDest);
-                    print(_pickedDates);
-                    // print(_pickedPax);
-                    Navigator.of(context).push(
-                      CupertinoPageRoute(
-                        builder: (BuildContext context) => SearchResultsPage(
-                          'random-search',
-                        ),
-                      ),
-                    );
-                  },
+                  onPressed: (_pickedDest == '')
+                      ? null
+                      : () {
+                          print(
+                              'Button press by driver to search for trips posted');
+                          print(_pickedDest);
+                          print(_pickedDates);
+                          // print(_pickedPax);
+                          if (_pickedDest != '') {
+                            Navigator.of(context).push(
+                              CupertinoPageRoute(
+                                builder: (BuildContext context) =>
+                                    SearchResultsPage(
+                                  _pickedDest,
+                                  _pickedDates,
+                                ),
+                              ),
+                            );
+                          }
+                        },
                 ),
               ),
             ),
@@ -136,14 +149,12 @@ class SearchField extends StatefulWidget {
     // @required this.searchHintText,
     // @required this.controller,
     this.onComplete,
-    // this.readOnly: true,
-    // TODO: Remove this later if destination field is not to be typed manually
   });
 
   final SearchType searchType;
   // final IconData iconData;
   // final String searchHintText;
-  final onComplete;
+  final Function onComplete;
   // final TextEditingController controller;
   // final bool readOnly;
 
@@ -162,25 +173,25 @@ class _SearchFieldState extends State<SearchField> {
 
   @override
   Widget build(BuildContext context) {
-    _handleDestTap() {}
+    // _handleDestTap() {}
 
-    _handlePaxTap() async {
-      int paxNumber = await showDialog<int>(
-        context: context,
-        builder: (BuildContext context) {
-          return NumberPickerDialog.integer(
-            title: Text('Number of Pax'),
-            minValue: 1,
-            maxValue: 10,
-            initialIntegerValue: 1,
-          );
-        },
-      );
+    // _handlePaxTap() async {
+    //   int paxNumber = await showDialog<int>(
+    //     context: context,
+    //     builder: (BuildContext context) {
+    //       return NumberPickerDialog.integer(
+    //         title: Text('Number of Pax'),
+    //         minValue: 1,
+    //         maxValue: 10,
+    //         initialIntegerValue: 1,
+    //       );
+    //     },
+    //   );
 
-      print(paxNumber);
-      _controller.text = '$paxNumber';
-      if (paxNumber != null) widget.onComplete(paxNumber);
-    }
+    //   print(paxNumber);
+    //   _controller.text = '$paxNumber';
+    //   if (paxNumber != null) widget.onComplete(paxNumber);
+    // }
 
     _handleDateTap() async {
       final List<DateTime> picked = await DateRagePicker.showDatePicker(
@@ -236,10 +247,14 @@ class _SearchFieldState extends State<SearchField> {
               child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: 10.0),
                 child: TextField(
-                  readOnly: true,
-                  // enabled: false,
+                  readOnly: (widget.searchType == SearchType.destination)
+                      ? false
+                      : true,
+                  onChanged: (widget.searchType == SearchType.destination)
+                      ? widget.onComplete
+                      : (_) {},
                   onTap: (widget.searchType == SearchType.destination)
-                      ? _handleDestTap
+                      ? () {}
                       : _handleDateTap,
                   controller: _controller,
                   decoration: InputDecoration(

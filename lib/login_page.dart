@@ -1,6 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:red_tailed_hawk/home_page.dart';
+import 'package:red_tailed_hawk/models/sp_helper.dart';
+import 'package:red_tailed_hawk/models/user_model.dart';
 import 'package:red_tailed_hawk/sign_up_page.dart';
 
 class LoginPage extends StatefulWidget {
@@ -13,7 +17,6 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  bool _isDriver = true;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -37,44 +40,60 @@ class _LoginPageState extends State<LoginPage> {
               ),
             ),
             Positioned.fill(
-                top: 150,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Expanded(
-                      flex: 1,
-                      child: Align(
-                        alignment: Alignment.topCenter,
-                        child: Text(
-                          "CORRIDE",
-                          style: TextStyle(
-                              fontSize: 60,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                              shadows: [
-                                Shadow(
-                                    blurRadius: 10.0,
-                                    color: Color(0xFFC67100),
-                                    offset: Offset(5.0, 5.0))
-                              ]),
-                        ),
+              top: 150,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Expanded(
+                    flex: 1,
+                    child: Align(
+                      alignment: Alignment.topCenter,
+                      child: Text(
+                        "CORRIDE",
+                        style: TextStyle(
+                            fontSize: 60,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            shadows: [
+                              Shadow(
+                                  blurRadius: 10.0,
+                                  color: Color(0xFFC67100),
+                                  offset: Offset(5.0, 5.0))
+                            ]),
                       ),
                     ),
-                    Expanded(
-                      child: loginCard(),
-                      flex: 6,
-                    )
-                  ],
-                )),
+                  ),
+                  Expanded(
+                    child: LoginCard(),
+                    flex: 6,
+                  )
+                ],
+              ),
+            ),
           ],
         ),
       ),
     );
   }
+}
 
-  navigateToSignIn() {}
+class LoginCard extends StatefulWidget {
+  @override
+  _LoginCardState createState() => _LoginCardState();
+}
 
-  Widget loginCard() {
+class _LoginCardState extends State<LoginCard> {
+  bool _isSwitched = true;
+
+  TextEditingController _emailController = TextEditingController(
+    text: 'chaelee7@email.com',
+  );
+  TextEditingController _pwController = TextEditingController(
+    text: 'secret',
+  );
+
+  @override
+  Widget build(BuildContext context) {
     return Align(
       child: Container(
         height: 500,
@@ -97,9 +116,9 @@ class _LoginPageState extends State<LoginPage> {
               padding: EdgeInsets.fromLTRB(0, 20.0, 0, 5.0),
               child: Column(
                 children: <Widget>[
-                  _signUpButton(true, "Sign Up as a Traveller",
+                  _signUpButton(false, "Sign Up as a Traveller",
                       Icons.person_outline, context),
-                  _signUpButton(false, "Sign Up as a Driver",
+                  _signUpButton(true, "Sign Up as a Driver",
                       Icons.directions_car, context),
                 ],
               ),
@@ -107,19 +126,29 @@ class _LoginPageState extends State<LoginPage> {
             _loginSignUpDivider(),
             Column(
               children: <Widget>[
-                _textInput(Icons.mail, "Email address", false),
-                _textInput(Icons.lock, "Password", true),
+                _textInput(
+                  Icons.mail,
+                  "Email address",
+                  false,
+                  _emailController,
+                ),
+                _textInput(
+                  Icons.lock,
+                  "Password",
+                  true,
+                  _pwController,
+                ),
               ],
             ),
             MyAccountSwitchButton(
-              isDriver: _isDriver,
+              isDriver: _isSwitched,
               onSwitch: (bool value) {
                 setState(() {
-                  _isDriver = value;
+                  _isSwitched = value;
                 });
               },
             ),
-            _loginButton(context, _isDriver),
+            _loginButton(context),
             FlatButton(
               onPressed: () {},
               child: Text(
@@ -132,95 +161,186 @@ class _LoginPageState extends State<LoginPage> {
       ),
     );
   }
-}
 
-Widget _loginButton(BuildContext context, bool forDriver) {
-  loginUser() {
-    Navigator.push(
-      context,
-      CupertinoPageRoute(
-        builder: (context) => HomePage(forDriver),
+  Widget _signUpButton(
+    bool forDriver,
+    String buttonText,
+    IconData icon,
+    BuildContext context,
+  ) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 5.0),
+      child: InkWell(
+        onTap: () async {
+          final newUser = await Navigator.of(context).push(
+            CupertinoPageRoute(
+              builder: (context) => SignUpPage(
+                isDriver: forDriver,
+              ),
+            ),
+          );
+
+          if (newUser != null) {
+            await SpHelper.saveUser(newUser);
+            Navigator.of(context).pushReplacement(
+              CupertinoPageRoute(
+                builder: (context) => HomePage(forDriver),
+              ),
+            );
+          }
+        },
+        child: Container(
+          height: 50,
+          width: 268,
+          decoration: BoxDecoration(
+            color: Color(0xFFFFA000),
+            borderRadius: BorderRadius.circular(15),
+          ),
+          child: Stack(
+            children: <Widget>[
+              Positioned(
+                child: Container(
+                    height: 50,
+                    width: 50,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(15),
+                      color: Color(0xFFC67100),
+                    ),
+                    child: Icon(
+                      icon,
+                      color: Colors.white,
+                    )),
+              ),
+              Positioned.fill(
+                left: 40,
+                child: Align(
+                  alignment: Alignment.center,
+                  child: Text(
+                    buttonText,
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold),
+                  ),
+                ),
+              )
+            ],
+          ),
+        ),
       ),
     );
   }
 
-  return Padding(
-    padding: EdgeInsets.symmetric(vertical: 5.0),
-    child: InkWell(
-      onTap: () {
-        loginUser();
-      },
+  Widget _textInput(IconData icon, String placeholder, bool isPassword,
+      TextEditingController controller) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 5.0),
       child: Container(
-        height: 50,
-        width: 268,
+        height: 50.0,
+        width: 268.0,
         decoration: BoxDecoration(
-          color: Color(0xFFC67100),
-          borderRadius: BorderRadius.circular(15),
+          color: Color(0xffeeeeee),
+          borderRadius: BorderRadius.circular(15.0),
         ),
-        child: Align(
-          alignment: Alignment.center,
-          child: Text(
-            "Login",
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
+        child: Row(
+          children: <Widget>[
+            Container(
+              height: 50,
+              width: 50,
+              decoration: BoxDecoration(
+                color: Color(0xffD4D4D4),
+                borderRadius: BorderRadius.circular(15.0),
+              ),
+              child: Icon(
+                icon,
+                color: Color(0xff9E9E9E),
+              ),
+            ),
+            Expanded(
+              child: TextField(
+                controller: controller,
+                obscureText: isPassword,
+                decoration: InputDecoration(
+                  contentPadding: EdgeInsets.symmetric(horizontal: 20.0),
+                  border: InputBorder.none,
+                  hintText: placeholder,
+                  hintStyle: TextStyle(
+                    color: Color(0xff9E9E9E),
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _loginButton(BuildContext context) {
+    loginUser() async {
+      // TODO: disable and spin button
+      String email = _emailController.text;
+      String password = _pwController.text;
+      var loggedInUser;
+      if (_isSwitched) {
+        // if pointed towards Driver
+        loggedInUser = await Driver.loginDriver(email, password);
+      } else {
+        loggedInUser = await Traveller.loginTraveller(email, password);
+      }
+      if (loggedInUser != null) {
+        // TODO: navigate and replace
+        await SpHelper.saveUser(loggedInUser);
+        Navigator.of(context).push(
+          CupertinoPageRoute(
+            builder: (context) => HomePage(_isSwitched),
+          ),
+        );
+      } else {
+        Scaffold.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Login Failed'),
+          ),
+        );
+      }
+      // Navigator.pushReplacement(
+      //   context,
+      //   CupertinoPageRoute(
+      //     builder: (context) => HomePage(forDriver),
+      //   ),
+      // );
+    }
+
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 5.0),
+      child: InkWell(
+        onTap: () {
+          loginUser();
+        },
+        child: Container(
+          height: 50,
+          width: 268,
+          decoration: BoxDecoration(
+            color: Color(0xFFC67100),
+            borderRadius: BorderRadius.circular(15),
+          ),
+          child: Align(
+            alignment: Alignment.center,
+            child: Text(
+              "Login",
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
         ),
       ),
-    ),
-  );
-}
-
-Widget _signUpButton(
-    bool forTraveller, String buttonText, IconData icon, BuildContext context) {
-  return Padding(
-    padding: EdgeInsets.symmetric(vertical: 5.0),
-    child: InkWell(
-      onTap: () {
-        print("Sign In Pressed");
-      },
-      child: Container(
-        height: 50,
-        width: 268,
-        decoration: BoxDecoration(
-          color: Color(0xFFFFA000),
-          borderRadius: BorderRadius.circular(15),
-        ),
-        child: Stack(
-          children: <Widget>[
-            Positioned(
-              child: Container(
-                  height: 50,
-                  width: 50,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(15),
-                    color: Color(0xFFC67100),
-                  ),
-                  child: Icon(
-                    icon,
-                    color: Colors.white,
-                  )),
-            ),
-            Positioned.fill(
-              left: 40,
-              child: Align(
-                alignment: Alignment.center,
-                child: Text(
-                  buttonText,
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold),
-                ),
-              ),
-            )
-          ],
-        ),
-      ),
-    ),
-  );
+    );
+  }
 }
 
 Widget _loginSignUpDivider() {
@@ -228,61 +348,17 @@ Widget _loginSignUpDivider() {
     mainAxisAlignment: MainAxisAlignment.spaceAround,
     children: <Widget>[
       Container(
-        height: 1.00,
-        width: 107.00,
+        height: 1.0,
+        width: 107.0,
         color: Color(0xff707070),
       ),
       Text("OR", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
       Container(
-        height: 1.00,
-        width: 107.00,
+        height: 1.0,
+        width: 107.0,
         color: Color(0xff707070),
       ),
     ],
-  );
-}
-
-Widget _textInput(IconData icon, String placeholder, bool isPassword) {
-  return Padding(
-    padding: EdgeInsets.symmetric(vertical: 5.0),
-    child: Container(
-      height: 50.00,
-      width: 268.00,
-      decoration: BoxDecoration(
-        color: Color(0xffeeeeee),
-        borderRadius: BorderRadius.circular(15.00),
-      ),
-      child: Row(
-        children: <Widget>[
-          Container(
-            height: 50,
-            width: 50,
-            decoration: BoxDecoration(
-              color: Color(0xffD4D4D4),
-              borderRadius: BorderRadius.circular(15.00),
-            ),
-            child: Icon(
-              icon,
-              color: Color(0xff9E9E9E),
-            ),
-          ),
-          Expanded(
-            child: TextField(
-              obscureText: isPassword,
-              decoration: InputDecoration(
-                contentPadding: EdgeInsets.symmetric(horizontal: 20.00),
-                border: InputBorder.none,
-                hintText: placeholder,
-                hintStyle: TextStyle(
-                    color: Color(0xff9E9E9E),
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold),
-              ),
-            ),
-          ),
-        ],
-      ),
-    ),
   );
 }
 
@@ -300,16 +376,33 @@ class MyAccountSwitchButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
-        Text("Traveller"),
-        Switch(
-          onChanged: onSwitch,
-          value: isDriver,
-          activeTrackColor: Color(0xffFFD299),
-          activeColor: Colors.orange,
+        Text(
+          "Traveller",
+          style: TextStyle(
+            color: isDriver ? Colors.grey : Colors.orange[700],
+            fontWeight: isDriver ? null : FontWeight.w600,
+          ),
         ),
-        Text("Driver")
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 20.0),
+          child: Switch(
+            onChanged: onSwitch,
+            value: isDriver,
+            activeTrackColor: Color(0xffFFD299),
+            activeColor: Colors.orange,
+            inactiveTrackColor: Color(0xffFFD299),
+            inactiveThumbColor: Colors.orange,
+          ),
+        ),
+        Text(
+          "Driver",
+          style: TextStyle(
+            color: isDriver ? Colors.orange[700] : Colors.grey,
+            fontWeight: isDriver ? FontWeight.w600 : null,
+          ),
+        )
       ],
     );
   }
