@@ -62,7 +62,7 @@ void _showAlertDialog(BuildContext context) {
                 child: RaisedButton(
                   onPressed: () {
                     Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => HomePage()));
+                        MaterialPageRoute(builder: (context) => HomePage(true)));
                   },
                   child: Text("OK"),
                   color: Color(0xffffd149),

@@ -23,7 +23,7 @@ class _SearchCardState extends State<SearchCard> {
   //   super.dispose();
   // }
   List<DateTime> _pickedDates = [];
-  int _pickedPax;
+  // int _pickedPax;
   String _pickedDest;
 
   @override
@@ -70,17 +70,17 @@ class _SearchCardState extends State<SearchCard> {
                 });
               },
             ),
-            SearchField(
-              // iconData: Icons.people,
-              // searchHintText: 'Select number of pax',
-              // controller: _paxCtrlr,
-              searchType: SearchType.pax,
-              onComplete: (int paxNumber) {
-                setState(() {
-                  _pickedPax = paxNumber;
-                });
-              },
-            ),
+            // SearchField(
+            //   // iconData: Icons.people,
+            //   // searchHintText: 'Select number of pax',
+            //   // controller: _paxCtrlr,
+            //   searchType: SearchType.pax,
+            //   onComplete: (int paxNumber) {
+            //     setState(() {
+            //       _pickedPax = paxNumber;
+            //     });
+            //   },
+            // ),
             // Container(
             //   padding: EdgeInsets.symmetric(vertical: 7.0),
             //   alignment: Alignment.center,
@@ -110,7 +110,7 @@ class _SearchCardState extends State<SearchCard> {
                   onPressed: () {
                     print(_pickedDest);
                     print(_pickedDates);
-                    print(_pickedPax);
+                    // print(_pickedPax);
                     Navigator.of(context).push(
                       CupertinoPageRoute(
                         builder: (BuildContext context) => SearchResultsPage(
@@ -227,9 +227,7 @@ class _SearchFieldState extends State<SearchField> {
                 child: Icon(
                   (widget.searchType == SearchType.destination)
                       ? Icons.search
-                      : (widget.searchType == SearchType.date)
-                          ? Icons.date_range
-                          : Icons.people,
+                      : Icons.date_range,
                   color: Colors.white,
                 ),
               ),
@@ -242,16 +240,12 @@ class _SearchFieldState extends State<SearchField> {
                   // enabled: false,
                   onTap: (widget.searchType == SearchType.destination)
                       ? _handleDestTap
-                      : (widget.searchType == SearchType.date)
-                          ? _handleDateTap
-                          : _handlePaxTap,
+                      : _handleDateTap,
                   controller: _controller,
                   decoration: InputDecoration(
                     hintText: (widget.searchType == SearchType.destination)
                         ? 'Enter your destination'
-                        : (widget.searchType == SearchType.date)
-                            ? 'Select your dates'
-                            : 'Select number of pax',
+                        : 'Select your dates',
                     hintStyle: TextStyle(color: Colors.grey),
                     border: InputBorder.none,
                   ),

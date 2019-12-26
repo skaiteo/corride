@@ -64,8 +64,10 @@ void _showAcceptAlertDialog(BuildContext context, bool isAccepted) {
                   height: 35.0,
                   child: RaisedButton(
                     onPressed: () {
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (context) => HomePage()));
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => HomePage(false)));
                     },
                     child: Text("OK"),
                     color: Color(0xffffd149),
@@ -94,17 +96,18 @@ void _showAcceptAlertDialog(BuildContext context, bool isAccepted) {
                 TextField(
                   maxLines: 5,
                   decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                    hintText: "Please state your reason."
-                  ),
+                      border: OutlineInputBorder(),
+                      hintText: "Please state your reason."),
                 ),
                 ButtonTheme(
                   minWidth: 117.0,
                   height: 35.0,
                   child: RaisedButton(
                     onPressed: () {
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (context) => HomePage()));
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => HomePage(false)));
                     },
                     child: Text("Submit"),
                     color: Color(0xffffd149),
