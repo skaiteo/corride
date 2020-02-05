@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:red_tailed_hawk/models/request_model.dart';
+import 'package:red_tailed_hawk/models/sp_helper.dart';
 import 'package:red_tailed_hawk/models/trip_model.dart';
 import 'package:red_tailed_hawk/models/user_model.dart';
 
@@ -19,11 +20,10 @@ class _ViewTripDetailsState extends State<ViewTripDetails> {
   bool _isRequesting = false;
 
   Future _makeOffer() async {
-    //TODO: create request
+    final user = await SpHelper.getUser();
     bool result = await Request.createRequest(
       travellerId: widget._traveller.id,
-      // TODO: Get this user (driver) id, maybe from prefs
-      driverId: "DriverID",
+      driverId: user.id,
       tripId: widget._thisTrip.id,
     );
     print(result);
@@ -161,7 +161,7 @@ class _ViewTripDetailsState extends State<ViewTripDetails> {
               Padding(
                 padding: EdgeInsets.all(2.0),
                 child: Text(
-                  "${widget._thisTrip.startDate.year}/${widget._thisTrip.startDate.month}/${widget._thisTrip.startDate.day} - ${widget._thisTrip.endDate.year}/${widget._thisTrip.endDate.month}/${widget._thisTrip.endDate.day}",
+                  "${widget._thisTrip.startDate.year}/${widget._thisTrip.startDate.month}/${widget._thisTrip.startDate.day} to ${widget._thisTrip.endDate.year}/${widget._thisTrip.endDate.month}/${widget._thisTrip.endDate.day}",
                   style: TextStyle(fontSize: 14.0),
                 ),
               ),

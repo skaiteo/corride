@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:red_tailed_hawk/models/user_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -23,7 +21,7 @@ class SpHelper {
     String name = prefs.getString('userName');
     String email = prefs.getString('userEmail');
     String phoneNo = prefs.getString('userPhone');
-    bool isDriver = prefs.getBool('userIsDriver');
+    bool isDriver = prefs.getBool('userIsDriver') ?? false;
     String carPlate = isDriver ? prefs.getString('userCarPlate') : null;
     if (isDriver) {
       return Driver(
@@ -41,5 +39,15 @@ class SpHelper {
         phoneNo: phoneNo,
       );
     }
+  }
+
+  static Future clearUser() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.remove('userId');
+    prefs.remove('userName');
+    prefs.remove('userEmail');
+    prefs.remove('userPhone');
+    // bool isDriver = prefs.getBool('userIsDriver');
+    prefs.remove('userCarPlate');
   }
 }

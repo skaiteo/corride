@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:red_tailed_hawk/models/user_model.dart';
 
 class SignUpPage extends StatefulWidget {
@@ -13,23 +12,25 @@ class SignUpPage extends StatefulWidget {
 
 class _SignUpPageState extends State<SignUpPage> {
   TextEditingController _emailCtrl = TextEditingController(
-    text: 'chaelee7@email.com',
-  );
+      // text: 'cha@email.com',
+      );
   TextEditingController _nameCtrl = TextEditingController(
-    text: 'chaelee7',
-  );
+      // text: 'cha',
+      );
   TextEditingController _phoneCtrl = TextEditingController(
-    text: '1239876',
-  );
+      // text: '1239876',
+      );
   TextEditingController _pwCtrl = TextEditingController(
-    text: 'secret',
-  );
+      // text: 'secret',
+      );
   TextEditingController _pwConfCtrl = TextEditingController(
-    text: 'secret',
-  );
+      // text: 'secret',
+      );
   TextEditingController _carPlateCtrl = TextEditingController(
-    text: 'QAD2993',
-  );
+      // text: 'QAD2993',
+      );
+
+  bool _signingUp = false;
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +38,9 @@ class _SignUpPageState extends State<SignUpPage> {
       body: Builder(
         builder: (BuildContext context) {
           _submitForm() async {
-            // TODO: set button loading
+            setState(() {
+              _signingUp = true;
+            });
             bool success = false;
             if (_nameCtrl.text != '' &&
                 _emailCtrl.text != '' &&
@@ -80,7 +83,6 @@ class _SignUpPageState extends State<SignUpPage> {
                     );
               // TODO: If possible, pushAndRemoveUntil
               Navigator.of(context).pop(newUser);
-              // TODO: unset button loading
             } else {
               Scaffold.of(context).showSnackBar(
                 SnackBar(
@@ -88,6 +90,10 @@ class _SignUpPageState extends State<SignUpPage> {
                 ),
               );
             }
+
+            setState(() {
+              _signingUp = false;
+            });
           }
 
           return SafeArea(
@@ -200,14 +206,16 @@ class _SignUpPageState extends State<SignUpPage> {
                                   borderRadius: BorderRadius.circular(15.0),
                                 ),
                                 color: Theme.of(context).primaryColorDark,
-                                child: Text(
-                                  'Create Account',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 17.0,
-                                  ),
-                                ),
-                                onPressed: _submitForm,
+                                child: _signingUp
+                                    ? CircularProgressIndicator()
+                                    : Text(
+                                        'Create Account',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 17.0,
+                                        ),
+                                      ),
+                                onPressed: _signingUp ? null : _submitForm,
                               ),
                             ),
                           ),

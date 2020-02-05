@@ -205,12 +205,15 @@ class _SearchFieldState extends State<SearchField> {
       if (picked != null) {
         print(picked);
         String dateStr = '';
-        if (picked.length == 2 && picked[0].compareTo(picked[1]) != 0)
-          // Compare first and last, if there is a diff, only then set dateStr to below
-          dateStr =
-              '${picked[0].year}/${picked[0].month}/${picked[0].day} - ${picked[1].year}/${picked[1].month}/${picked[1].day}';
-        else
-          dateStr = '${picked[0].year}/${picked[0].month}/${picked[0].day}';
+        if (picked.length == 1) {
+          picked.add(picked[0]);
+        }
+        // if (picked.length == 2 && picked[0].compareTo(picked[1]) != 0)
+        // Compare first and last, if there is a diff, only then set dateStr to below
+        dateStr =
+            '${picked[0].year}/${picked[0].month}/${picked[0].day} - ${picked[1].year}/${picked[1].month}/${picked[1].day}';
+        // else
+        //   dateStr = '${picked[0].year}/${picked[0].month}/${picked[0].day}';
         _controller.text = dateStr;
 
         widget.onComplete(picked);

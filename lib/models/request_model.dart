@@ -23,7 +23,6 @@ class Request {
 
   static Future<List<Request>> fetchRequests(
       {String travellerId, String driverId}) async {
-    //TODO: check this
     final response = await http.post(
       'https://corride.000webhostapp.com/corride/request/getRequest.php',
       body: jsonEncode({
@@ -33,7 +32,9 @@ class Request {
     );
 
     if (response.statusCode == 200) {
-      List requestMaps = jsonDecode(response.body)['requests'] ?? [];
+      Map body = jsonDecode(response.body);
+      List requestMaps =
+          (driverId != null) ? body['requests'] ?? [] : body['request'] ?? [];
 
       List<Request> requests = requestMaps.where((requestMap) {
         // Filter pending and accepted for respective situtations

@@ -37,10 +37,15 @@ class _SearchResultsPageState extends State<SearchResultsPage> {
             .toLowerCase()
             .contains(widget._searchTerm.toLowerCase())) {
           if (widget._searchDates.isNotEmpty) {
-            return widget._searchDates[0].isBefore(trip.startDate) &&
-                widget._searchDates[1].isAfter(trip.endDate);
+            return widget._searchDates[0]
+                    .subtract(Duration(seconds: 1))
+                    .isBefore(trip.startDate) &&
+                widget._searchDates[1]
+                    .add(Duration(seconds: 1))
+                    .isAfter(trip.endDate) &&
+                trip.driverId == null;
           } else {
-            return true;
+            return trip.driverId == null;
           }
         } else {
           return false;
@@ -84,27 +89,28 @@ class _SearchResultsPageState extends State<SearchResultsPage> {
                 ),
               ),
               Padding(
-                  padding: EdgeInsets.fromLTRB(20.0, 30.0, 20.0, 20.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Text(
-                        'Trips Available',
-                        style: Theme.of(context).textTheme.display1.copyWith(
-                              color: Colors.black,
-                            ),
-                      ),
-                      SizedBox(
-                        height: 10.0,
-                      ),
-                      Text(
-                        'Search results for "${widget._searchTerm}"',
-                        style: Theme.of(context).textTheme.subhead.copyWith(
-                              color: Colors.grey[600],
-                            ),
-                      ),
-                    ],
-                  )),
+                padding: EdgeInsets.fromLTRB(20.0, 30.0, 20.0, 20.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      'Trips Available',
+                      style: Theme.of(context).textTheme.display1.copyWith(
+                            color: Colors.black,
+                          ),
+                    ),
+                    SizedBox(
+                      height: 10.0,
+                    ),
+                    Text(
+                      'Search results for "${widget._searchTerm}"',
+                      style: Theme.of(context).textTheme.subhead.copyWith(
+                            color: Colors.grey[600],
+                          ),
+                    ),
+                  ],
+                ),
+              ),
               Expanded(
                 child: FutureBuilder(
                   future: _calculation,

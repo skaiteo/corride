@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:red_tailed_hawk/home_page.dart';
@@ -83,14 +81,15 @@ class LoginCard extends StatefulWidget {
 }
 
 class _LoginCardState extends State<LoginCard> {
-  bool _isSwitched = true;
+  bool _isSwitched = false;
+  bool _loggingIn = false;
 
   TextEditingController _emailController = TextEditingController(
-    text: 'chaelee7@email.com',
-  );
+      // text: 'cha@email.com',
+      );
   TextEditingController _pwController = TextEditingController(
-    text: 'secret',
-  );
+      // text: 'secret',
+      );
 
   @override
   Widget build(BuildContext context) {
@@ -280,10 +279,14 @@ class _LoginCardState extends State<LoginCard> {
 
   Widget _loginButton(BuildContext context) {
     loginUser() async {
-      // TODO: disable and spin button
+      setState(() {
+        _loggingIn = true;
+      });
       String email = _emailController.text;
       String password = _pwController.text;
       var loggedInUser;
+      // print('_isSwitched');
+      // print(_isSwitched);
       if (_isSwitched) {
         // if pointed towards Driver
         loggedInUser = await Driver.loginDriver(email, password);
@@ -293,7 +296,7 @@ class _LoginCardState extends State<LoginCard> {
       if (loggedInUser != null) {
         // TODO: navigate and replace
         await SpHelper.saveUser(loggedInUser);
-        Navigator.of(context).push(
+        Navigator.of(context).pushReplacement(
           CupertinoPageRoute(
             builder: (context) => HomePage(_isSwitched),
           ),
@@ -305,20 +308,20 @@ class _LoginCardState extends State<LoginCard> {
           ),
         );
       }
-      // Navigator.pushReplacement(
-      //   context,
-      //   CupertinoPageRoute(
-      //     builder: (context) => HomePage(forDriver),
-      //   ),
-      // );
+
+      setState(() {
+        _loggingIn = false;
+      });
     }
 
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 5.0),
       child: InkWell(
-        onTap: () {
-          loginUser();
-        },
+        onTap: _loggingIn
+            ? null
+            : () {
+                loginUser();
+              },
         child: Container(
           height: 50,
           width: 268,
@@ -328,14 +331,16 @@ class _LoginCardState extends State<LoginCard> {
           ),
           child: Align(
             alignment: Alignment.center,
-            child: Text(
-              "Login",
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+            child: _loggingIn
+                ? CircularProgressIndicator()
+                : Text(
+                    "Login",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
           ),
         ),
       ),

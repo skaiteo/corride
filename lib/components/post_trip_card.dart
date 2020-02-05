@@ -2,6 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:date_range_picker/date_range_picker.dart' as DateRagePicker;
 import 'package:numberpicker/numberpicker.dart';
+import 'package:red_tailed_hawk/models/sp_helper.dart';
+import 'package:red_tailed_hawk/models/trip_model.dart';
 
 enum SearchType { destination, date, pax }
 
@@ -23,7 +25,7 @@ class _PostTripCardState extends State<PostTripCard> {
   // }
   List<DateTime> _pickedDates = [];
   int _pickedPax;
-  String _pickedDest;
+  String _pickedDest = '';
 
   @override
   Widget build(BuildContext context) {
@@ -56,6 +58,11 @@ class _PostTripCardState extends State<PostTripCard> {
               // controller: _destCtrlr,
               // onTapCallback: () {},
               searchType: SearchType.destination,
+              onComplete: (String dest) {
+                setState(() {
+                  _pickedDest = dest;
+                });
+              },
               // readOnly: false,
             ),
             SearchField(
@@ -99,6 +106,7 @@ class _PostTripCardState extends State<PostTripCard> {
                     borderRadius: BorderRadius.circular(15.0),
                   ),
                   color: Colors.orange,
+                  disabledColor: Colors.grey,
                   child: Text(
                     'Post Trip',
                     style: TextStyle(
@@ -106,20 +114,100 @@ class _PostTripCardState extends State<PostTripCard> {
                       fontSize: 17.0,
                     ),
                   ),
-                  onPressed: () {
-                    print('Button press by traveller to post a new trip');
-                    print(_pickedDest);
-                    print(_pickedDates);
-                    print(_pickedPax);
-                    // Navigator.of(context).push(
-                    //   CupertinoPageRoute(
-                    //     builder: (BuildContext context) => SearchResultsPage(
-                    //       'random-search',
-
-                    //     ),
-                    //   ),
-                    // );
-                  },
+                  onPressed: (_pickedDest == '' ||
+                          _pickedDates.isEmpty ||
+                          _pickedPax == null)
+                      ? null
+                      : () async {
+                          print('Button press by traveller to post a new trip');
+                          print(_pickedDest);
+                          print(_pickedDates);
+                          print(_pickedPax);
+                          bool confirm = await showDialog(
+                            context: context,
+                            barrierDismissible: false,
+                            builder: (context) {
+                              return AlertDialog(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(15.0),
+                                ),
+                                title: Text('Confirm New Trip'),
+                                content: Row(
+                                  children: <Widget>[
+                                    Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: <Widget>[
+                                        Text('Destination:   '),
+                                        Text('Start date: '),
+                                        Text('End date: '),
+                                        Text('Pax:'),
+                                      ],
+                                    ),
+                                    Expanded(
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: <Widget>[
+                                          Text('$_pickedDest'),
+                                          Text(
+                                            '${_pickedDates[0].year}/${_pickedDates[0].month}/${_pickedDates[0].day}',
+                                          ),
+                                          Text(
+                                            // (_pickedDates.length == 1)
+                                            //     ? '${_pickedDates[0].year}/${_pickedDates[0].month}/${_pickedDates[0].day}'
+                                            '${_pickedDates[1].year}/${_pickedDates[1].month}/${_pickedDates[1].day}',
+                                          ),
+                                          Text('$_pickedPax'),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                actions: <Widget>[
+                                  FlatButton(
+                                    child: Text('Cancel'),
+                                    onPressed: () {
+                                      Navigator.of(context).pop(false);
+                                    },
+                                  ),
+                                  FlatButton(
+                                    child: Text('OK'),
+                                    onPressed: () {
+                                      Navigator.of(context).pop(true);
+                                    },
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                          if (confirm == true) {
+                            print('creating trip');
+                            final user = await SpHelper.getUser();
+                            bool created = await Trip.createTrip(
+                              userId: user.id,
+                              dest: _pickedDest,
+                              startDate: _pickedDates[0],
+                              endDate:
+                                  /* (_pickedDates.length == 1)
+                                  ? _pickedDates[0]
+                                  :  */
+                                  _pickedDates[1],
+                            );
+                            Scaffold.of(context).showSnackBar(SnackBar(
+                              content: Text(
+                                (created)
+                                    ? 'Post created!'
+                                    : 'Something went wrong',
+                              ),
+                            ));
+                            if (created == true) {
+                              // TODO: clear fields
+                            }
+                          }
+                        },
                 ),
               ),
             ),
@@ -177,8 +265,8 @@ class _SearchFieldState extends State<SearchField> {
       );
 
       print(paxNumber);
-      _controller.text = '$paxNumber';
-      if (paxNumber != null) widget.onComplete(paxNumber);
+      _controller.text = (paxNumber == null) ? '' : '$paxNumber';
+      widget.onComplete(paxNumber);
     }
 
     _handleDateTap() async {
@@ -237,7 +325,12 @@ class _SearchFieldState extends State<SearchField> {
               child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: 10.0),
                 child: TextField(
-                  readOnly: true,
+                  readOnly: (widget.searchType == SearchType.destination)
+                      ? false
+                      : true,
+                  onChanged: (widget.searchType == SearchType.destination)
+                      ? widget.onComplete
+                      : (_) {},
                   // enabled: false,
                   onTap: (widget.searchType == SearchType.destination)
                       ? _handleDestTap
